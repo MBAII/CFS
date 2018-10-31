@@ -125,6 +125,42 @@ def Portfolio2():
             holding_option.append("Put")
     return total_return, daily_return_list, daily_return_cumulative
 
+def Portfolio3():
+    length = len(sp_price_global)
+
+    call_put_list = [] #[[call_price1,put_price1],[call_price2,put_price2]...]
+    daily_return_list = [0]
+    daily_return_cumulative = [0]
+    total_return = 0
+    #store all call and put in a list
+    for i in range(length):
+        call,put = BS_model(sp_price_global[i],sp_price_global[i],90.0/365.0,libor_global[i]/100.0,vix_global[i]/100.0)
+        call_put_list.append([call,put])
+    #calculate the daily return
+    position = ""
+    if sixty_day_ave_price[0] > hundrend_twenty_ave_price[0]:
+        position = "long"
+    else:
+        position = "short"
+    for i in range(1, length):
+        if position == "long":
+            daily_return = (call_put_list[i][0] - call_put_list[i-1][0]) * 1 + \
+                           (call_put_list[i][1] - call_put_list[i - 1][1]) * 1
+        else:
+            daily_return = (call_put_list[i][0] - call_put_list[i - 1][0]) * -1 + \
+                           (call_put_list[i][1] - call_put_list[i - 1][1]) * -1
+
+        # print holding_option.count("Call") + holding_option.count("Put")
+        # print daily_return
+        total_return += daily_return
+        daily_return_cumulative.append(total_return)
+        daily_return_list.append(daily_return)
+        if sixty_day_ave_price[i] > hundrend_twenty_ave_price[i]:
+            position = "long"
+        else:
+            position = "short"
+    return total_return, daily_return_list, daily_return_cumulative
+
 def main():
     # read file
     df = pd.read_csv("data_modified.csv")
@@ -173,12 +209,18 @@ def main():
     # plt.legend()
     # plt.show()
 
-    ##Portfolio 1
+    ##Portfolio 2
     # r2 = Portfolio2()
     # plt.plot(r2[2],linewidth=1,label='Cumulative Return')
     # plt.legend()
     # plt.show()
 
+
+    ##Portfolio 3
+    # r3 = Portfolio3()
+    # plt.plot(r3[2],linewidth=1,label='Cumulative Return')
+    # plt.legend()
+    # plt.show()
 
 
 
