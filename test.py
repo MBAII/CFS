@@ -1,14 +1,19 @@
-import collections
+import math
+import copy
 
-l = collections.deque(maxlen=5)
-l.append('apple')
-l.append('orange')
-l.append('grape')
-l.append('banana')
-l.append('mango')
-print(l)
-l.append('kiwi')
-print(l)
-print l.count('kiwi')
 
-print 90.0/365
+dic = {"liu":1, "bai": 2, "ma": 3, "zeng":4}
+dic["zeng"] = 5
+for k in dic:
+    print dic[k]
+
+
+print dic.keys()
+print dic.values()
+
+f = open("data.txt", "w")
+f.writelines(["123\n","123\n","123\n","123\n","123\n","123"])
+f.close()
+
+
+
