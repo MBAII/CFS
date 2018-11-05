@@ -1,10 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from Black_Scholes import BS_model
-import numpy
+import numpy as np
 import copy
 import collections
-
+import math
 
 sp_price_global = []
 libor_global = []
@@ -184,6 +184,51 @@ def Portfolio3():
         holding_option_list.append(["Put", put, i])
     return total_return, daily_return_list, daily_return_cumulative
 
+
+def Var_function():
+    var_lines = [0]
+    Cvar_lines = [0]
+    position = 1
+    if sixty_day_ave_price[0] > hundrend_twenty_ave_price[0]:
+        position = 1
+    else:
+        position = -1
+    length = len(sp_price_global)
+    for j in range(1,length):
+        mu, sigma = (libor_global[j]-(vix_global[j]**2) / 2) * 1/252, (vix_global[j]**2) * 1/252
+        s = np.random.normal(mu, sigma, 10000)
+        loss_list = []
+        for i in range(len(s)):
+            loss = position * libor_global[j] * (1 - math.exp(s[i]))
+            loss_list.append(loss)
+        loss_list.sort()
+        index_95 = int(math.ceil(0.95 * len(loss_list)))
+        var = loss_list[index_95]
+        Cvar = sum(loss_list[index_95:]) / len(loss_list[index_95:])
+        if sixty_day_ave_price[j] > hundrend_twenty_ave_price[j]:
+            position = 1
+        else:
+            position = -1
+        var_lines.append(var)
+        Cvar_lines.append(Cvar)
+    print var_lines
+    print Cvar_lines
+    # plt.plot(var_lines,linewidth=1,label='Var')
+    plt.plot(range(len(var_lines)),Cvar_lines, linewidth=1, label='Cvar')
+    plt.legend()
+    plt.show()
+
+    # print loss_list
+    # print var
+    # print Cvar
+
+
+
+
+
+
+
+
 def main():
     # read file
     df = pd.read_csv("data_modified.csv")
@@ -244,6 +289,8 @@ def main():
     # plt.legend()
     # plt.show()
 
+    ##Var
+    Var_function()
 
 
 if __name__ == '__main__':
