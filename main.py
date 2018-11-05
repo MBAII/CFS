@@ -195,11 +195,11 @@ def Var_function():
         position = -1
     length = len(sp_price_global)
     for j in range(1,length):
-        mu, sigma = (libor_global[j]-(vix_global[j]**2) / 2) * 1/252, (vix_global[j]**2) * 1/252
+        mu, sigma = (libor_global[j]/100.0-((vix_global[j]/100.0)**2) / 2) * 1/252, ((vix_global[j]/100.0)**2) * 1/252
         s = np.random.normal(mu, sigma, 10000)
         loss_list = []
         for i in range(len(s)):
-            loss = position * libor_global[j] * (1 - math.exp(s[i]))
+            loss = position * sp_price_global[j] * (1 - math.exp(s[i]))
             loss_list.append(loss)
         loss_list.sort()
         index_95 = int(math.ceil(0.95 * len(loss_list)))
@@ -218,9 +218,34 @@ def Var_function():
     plt.legend()
     plt.show()
 
-    # print loss_list
-    # print var
-    # print Cvar
+    print loss_list
+    print var
+    print Cvar
+
+
+def random_path():
+    N = 10000
+    mu, sigma = ((1.5 * libor_global[0])/100.0 - ((vix_global[0]/100.0) ** 2) / 2) * 1 / 252, ((vix_global[0]/100.0) ** 2) * 1 / 252
+    s = np.random.normal(mu, sigma, N)
+    length = len(sp_price_global)
+    path_list = []
+    path = [sp_price_global[0]]
+    for i in range(N):
+        for j in range(1,length):
+            temp = np.random.normal(mu, sigma, 1)
+            new_point = path[j-1] * math.exp(temp[0])
+            path.append(new_point)
+        path = [sp_price_global[0]]
+        path_list.append(path)
+    last_day_price = []
+    for ls in path_list:
+        # plt.plot(ls,linewidth=1)
+        last_day_price.append(ls[-1])
+    plt.hist(last_day_price,200)
+    plt.legend()
+    plt.show()
+
+
 
 
 
@@ -290,8 +315,8 @@ def main():
     # plt.show()
 
     ##Var
-    Var_function()
-
+    # Var_function()
+    random_path()
 
 if __name__ == '__main__':
     main()
